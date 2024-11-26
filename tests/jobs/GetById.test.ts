@@ -1,51 +1,53 @@
 import { StatusCodes } from 'http-status-codes';
 import { testServer } from '../jest.setup';
+import { IJobCreatePayload, IUsuario } from '../../src/server/database/models';
 
 describe('Jobs - GetById', () => {
     let accessToken = '';
+    let responsibleId: number | undefined = undefined;
     beforeAll(async () => {
-        const email = 'getbyid-pessoas@gmail.com';
-        const senha = '123456';
-        await testServer
-            .post('/cadastrar')
-            .send({ username: 'Teste', email, senha });
+        const usuario: Omit<IUsuario, 'id' | 'updatedAt' | 'createdAt'> = {
+            nomeCompleto: 'Busca um registro',
+            email: 'busca.um.registro@gmail.com',
+            senha: '123456',
+            role: 'admin',
+            sector: 'digital',
+        };
+        await testServer.post('/cadastrar').send(usuario);
         const signInRes = await testServer
             .post('/entrar')
-            .send({ email, senha });
+            .send({ email: usuario.email, senha: usuario.senha });
         accessToken = signInRes.body.accessToken;
-    });
-
-    let cidadeId: number | undefined = undefined;
-    beforeAll(async () => {
-        const resCidade = await testServer
-            .post('/cidades')
-            .set({ Authorization: `Bearer ${accessToken}` })
-            .send({ nome: 'Cidade Teste' });
-        cidadeId = resCidade.body;
+        responsibleId = signInRes.body.user.id;
     });
 
     it('Busca registro por id', async () => {
+        const newJob: IJobCreatePayload = {
+            nDoc: 'getById',
+            title: 'Teste de criação',
+            project: 'Projeto Teste',
+            status: 'Em andamento',
+            jobSituation: 'Situação teste',
+            deadline: new Date(),
+            responsibleId: responsibleId ?? 0,
+        };
         const res1 = await testServer
-            .post('/pessoas')
+            .post('/jobs')
             .set({ Authorization: `Bearer ${accessToken}` })
-            .send({
-                nomeCompleto: 'João Carlos',
-                email: 'joao.carlos.getById@gmail.com',
-                cidadeId,
-            });
+            .send(newJob);
         expect(res1.statusCode).toEqual(StatusCodes.CREATED);
 
         const resBuscada = await testServer
-            .get(`/pessoas/${res1.body}`)
+            .get(`/jobs/${res1.body}`)
             .set({ Authorization: `Bearer ${accessToken}` })
             .send();
         expect(resBuscada.statusCode).toEqual(StatusCodes.OK);
-        expect(resBuscada.body).toHaveProperty('nomeCompleto');
+        expect(resBuscada.body).toHaveProperty('nDoc');
     });
 
     it('Tenta buscar registro que não existe', async () => {
         const res1 = await testServer
-            .get('/pessoas/99999')
+            .get('/jobs/99999')
             .set({ Authorization: `Bearer ${accessToken}` })
             .send();
 
@@ -54,17 +56,22 @@ describe('Jobs - GetById', () => {
     });
 
     it('Tenta buscar registro por id não estando autenticado', async () => {
+        const newJob: IJobCreatePayload = {
+            nDoc: 'getById2',
+            title: 'Teste de criação',
+            project: 'Projeto Teste',
+            status: 'Em andamento',
+            jobSituation: 'Situação teste',
+            deadline: new Date(),
+            responsibleId: responsibleId ?? 0,
+        };
         const res1 = await testServer
-            .post('/pessoas')
+            .post('/jobs')
             .set({ Authorization: `Bearer ${accessToken}` })
-            .send({
-                nomeCompleto: 'João Carlos',
-                email: 'joao.carlos.getByIdNotAuthenticated@gmail.com',
-                cidadeId,
-            });
+            .send(newJob);
         expect(res1.statusCode).toEqual(StatusCodes.CREATED);
 
-        const resBuscada = await testServer.get(`/pessoas/${res1.body}`).send();
+        const resBuscada = await testServer.get(`/jobs/${res1.body}`).send();
         expect(resBuscada.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
         expect(resBuscada.body).toHaveProperty('errors.default');
     });

@@ -1,9 +1,9 @@
 import { ETableNames } from '../../ETableNames';
 import { Knex } from '../../knex';
-import { IJob } from '../../models';
+import { IJobCreatePayload } from '../../models';
 
 export const create = async (
-    job: Omit<IJob, 'id'>
+    job: IJobCreatePayload
 ): Promise<number | Error> => {
     try {
         const [result] = await Knex(ETableNames.job)

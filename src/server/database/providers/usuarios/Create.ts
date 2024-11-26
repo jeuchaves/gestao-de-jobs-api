@@ -4,7 +4,7 @@ import { Knex } from '../../knex';
 import { IUsuario } from '../../models';
 
 export const create = async (
-    usuario: Omit<IUsuario, 'id'>
+    usuario: Omit<IUsuario, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<number | Error> => {
     try {
         const hashedPassword = await PasswordCrypto.hashPassword(usuario.senha);

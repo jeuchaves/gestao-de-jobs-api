@@ -1,42 +1,44 @@
 import { StatusCodes } from 'http-status-codes';
 import { testServer } from '../jest.setup';
+import { IJobCreatePayload, IUsuario } from '../../src/server/database/models';
 
 describe('Jobs - GetAll', () => {
     let accessToken = '';
+    let responsibleId: number | undefined = undefined;
     beforeAll(async () => {
-        const email = 'getall-pessoas@gmail.com';
-        const senha = '123456';
-        await testServer
-            .post('/cadastrar')
-            .send({ username: 'Teste', email, senha });
+        const usuario: Omit<IUsuario, 'id' | 'updatedAt' | 'createdAt'> = {
+            nomeCompleto: 'Busca registro',
+            email: 'busca.registro@gmail.com',
+            senha: '123456',
+            role: 'admin',
+            sector: 'digital',
+        };
+        await testServer.post('/cadastrar').send(usuario);
         const signInRes = await testServer
             .post('/entrar')
-            .send({ email, senha });
+            .send({ email: usuario.email, senha: usuario.senha });
         accessToken = signInRes.body.accessToken;
-    });
-
-    let cidadeId: number | undefined = undefined;
-    beforeAll(async () => {
-        const resCidade = await testServer
-            .post('/cidades')
-            .set({ Authorization: `Bearer ${accessToken}` })
-            .send({ nome: 'Cidade Teste' });
-        cidadeId = resCidade.body;
+        responsibleId = signInRes.body.user.id;
     });
 
     it('Buscar todos os registros', async () => {
+        const newJob: IJobCreatePayload = {
+            nDoc: '1234567890123456',
+            title: 'Teste de criação',
+            project: 'Projeto Teste',
+            status: 'Em andamento',
+            jobSituation: 'Situação teste',
+            deadline: new Date(),
+            responsibleId: responsibleId ?? 0,
+        };
         const res1 = await testServer
-            .post('/pessoas')
+            .post('/jobs')
             .set({ Authorization: `Bearer ${accessToken}` })
-            .send({
-                nomeCompleto: 'João Carlos',
-                email: 'joao.carlos.getall@gmail.com',
-                cidadeId,
-            });
+            .send(newJob);
         expect(res1.statusCode).toEqual(StatusCodes.CREATED);
 
         const resBuscada = await testServer
-            .get('/cidades')
+            .get('/jobs')
             .set({ Authorization: `Bearer ${accessToken}` })
             .send();
         expect(Number(resBuscada.header['x-total-count'])).toBeGreaterThan(0);
@@ -45,17 +47,22 @@ describe('Jobs - GetAll', () => {
     });
 
     it('Tenta buscar todos os registros não estando autenticado', async () => {
+        const newJob: IJobCreatePayload = {
+            nDoc: '12345678901234567',
+            title: 'Teste de criação',
+            project: 'Projeto Teste',
+            status: 'Em andamento',
+            jobSituation: 'Situação teste',
+            deadline: new Date(),
+            responsibleId: responsibleId ?? 0,
+        };
         const res1 = await testServer
-            .post('/pessoas')
+            .post('/jobs')
             .set({ Authorization: `Bearer ${accessToken}` })
-            .send({
-                nomeCompleto: 'João Carlos',
-                email: 'joao.carlos.getall-notauthenticated@gmail.com',
-                cidadeId,
-            });
+            .send(newJob);
         expect(res1.statusCode).toEqual(StatusCodes.CREATED);
 
-        const resBuscada = await testServer.get('/cidades').send();
+        const resBuscada = await testServer.get('/jobs').send();
         expect(resBuscada.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
         expect(resBuscada.body).toHaveProperty('errors.default');
     });

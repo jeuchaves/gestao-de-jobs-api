@@ -17,3 +17,15 @@ export interface IJob {
     createdAt?: Date;
     updatedAt?: Date;
 }
+
+export interface IJobCreatePayload
+    extends Pick<
+        IJob,
+        | 'nDoc'
+        | 'title'
+        | 'project'
+        | 'status'
+        | 'jobSituation'
+        | 'deadline'
+        | 'responsibleId'
+    > {}

@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { boolean, date, number, object, string } from 'yup';
+import { date, number, object, string } from 'yup';
 
 import { JobsProvider } from '../../database/providers';
 import { validation } from '../../shared/middleware';
-import { IJob } from '../../database/models';
+import { IJobCreatePayload } from '../../database/models';
 
-interface IBodyProps extends Omit<IJob, 'id'> {}
+interface IBodyProps extends IJobCreatePayload {}
 
 export const createValidation = validation((getSchema) => ({
     body: getSchema<IBodyProps>(
@@ -18,17 +18,6 @@ export const createValidation = validation((getSchema) => ({
             jobSituation: string().optional(),
             deadline: date().required(),
             responsibleId: number().required(),
-            estimatedComplexity: string()
-                .oneOf(['simple', 'regular', 'complex'])
-                .optional(),
-            isChangeRequest: boolean().required(),
-            timeSheet: number().required(),
-            actualComplexity: string()
-                .oneOf(['simple', 'regular', 'complex'])
-                .optional(),
-            contingencies: string().optional(),
-            createdAt: date().optional(),
-            updatedAt: date().optional(),
         })
     ),
 }));

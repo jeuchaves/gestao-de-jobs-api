@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { date, object, string } from 'yup';
+import { object, string } from 'yup';
 
 import { UsuariosProvider } from '../../database/providers';
 import { validation } from '../../shared/middleware';
 import { IUsuario } from '../../database/models';
 
-interface IBodyProps extends Omit<IUsuario, 'id'> {}
+interface IBodyProps extends Omit<IUsuario, 'id' | 'createdAt' | 'updatedAt'> {}
 
 export const signUpValidation = validation((getSchema) => ({
     body: getSchema<IBodyProps>(
@@ -18,8 +18,6 @@ export const signUpValidation = validation((getSchema) => ({
             sector: string()
                 .oneOf(['digital', 'creative', 'finance', 'customer_service'])
                 .required(),
-            createdAt: date().optional(),
-            updatedAt: date().optional(),
         })
     ),
 }));

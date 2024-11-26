@@ -9,6 +9,6 @@ export interface IUsuario {
     senha: string;
     role: TRoles;
     sector: TSectors;
-    createdAt?: Date;
-    updatedAt?: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }

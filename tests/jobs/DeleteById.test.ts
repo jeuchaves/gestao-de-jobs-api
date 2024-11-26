@@ -1,43 +1,44 @@
 import { StatusCodes } from 'http-status-codes';
 import { testServer } from '../jest.setup';
+import { IJobCreatePayload, IUsuario } from '../../src/server/database/models';
 
 describe('Jobs - DeleteById', () => {
     let accessToken = '';
+    let responsibleId: number | undefined = undefined;
     beforeAll(async () => {
-        const email = 'deletebyid-pessoas@gmail.com';
-        const senha = '123456';
-        await testServer
-            .post('/cadastrar')
-            .send({ username: 'Teste', email, senha });
+        const usuario: Omit<IUsuario, 'id' | 'updatedAt' | 'createdAt'> = {
+            nomeCompleto: 'Deleta registro',
+            email: 'deleta.registro@gmail.com',
+            senha: '123456',
+            role: 'admin',
+            sector: 'digital',
+        };
+        await testServer.post('/cadastrar').send(usuario);
         const signInRes = await testServer
             .post('/entrar')
-            .send({ email, senha });
+            .send({ email: usuario.email, senha: usuario.senha });
         accessToken = signInRes.body.accessToken;
-    });
-
-    let cidadeId: number | undefined = undefined;
-    beforeAll(async () => {
-        const resCidade = await testServer
-            .post('/cidades')
-            .set({ Authorization: `Bearer ${accessToken}` })
-            .send({ nome: 'Cidade Teste' });
-        cidadeId = resCidade.body;
-        console.log('Cidade ID: ', cidadeId);
+        responsibleId = signInRes.body.user.id;
     });
 
     it('Apaga registro', async () => {
+        const newJob: IJobCreatePayload = {
+            nDoc: '123456789012',
+            title: 'Teste de criação',
+            project: 'Projeto Teste',
+            status: 'Em andamento',
+            jobSituation: 'Situação teste',
+            deadline: new Date(),
+            responsibleId: responsibleId ?? 0,
+        };
         const res1 = await testServer
-            .post('/pessoas')
+            .post('/jobs')
             .set({ Authorization: `Bearer ${accessToken}` })
-            .send({
-                nomeCompleto: 'João Carlos',
-                email: 'joao.carlos.deleteById@gmail.com',
-                cidadeId,
-            });
+            .send(newJob);
         expect(res1.statusCode).toEqual(StatusCodes.CREATED);
 
         const resApagada = await testServer
-            .delete(`/pessoas/${res1.body}`)
+            .delete(`/jobs/${res1.body}`)
             .set({ Authorization: `Bearer ${accessToken}` })
             .send();
         expect(resApagada.statusCode).toEqual(StatusCodes.NO_CONTENT);
@@ -45,7 +46,7 @@ describe('Jobs - DeleteById', () => {
 
     it('Tenta apagar registro que não existe', async () => {
         const res1 = await testServer
-            .delete('/pessoas/99999')
+            .delete('/jobs/99999')
             .set({ Authorization: `Bearer ${accessToken}` })
             .send();
 
@@ -54,19 +55,22 @@ describe('Jobs - DeleteById', () => {
     });
 
     it('Tenta apagar registro não estando autenticado', async () => {
+        const newJob: IJobCreatePayload = {
+            nDoc: '1234567890123',
+            title: 'Teste de criação',
+            project: 'Projeto Teste',
+            status: 'Em andamento',
+            jobSituation: 'Situação teste',
+            deadline: new Date(),
+            responsibleId: responsibleId ?? 0,
+        };
         const res1 = await testServer
-            .post('/pessoas')
+            .post('/jobs')
             .set({ Authorization: `Bearer ${accessToken}` })
-            .send({
-                nomeCompleto: 'João Carlos',
-                email: 'joao.carlos.deleteById-notauthenticated@gmail.com',
-                cidadeId,
-            });
+            .send(newJob);
         expect(res1.statusCode).toEqual(StatusCodes.CREATED);
 
-        const resApagada = await testServer
-            .delete(`/pessoas/${res1.body}`)
-            .send();
+        const resApagada = await testServer.delete(`/jobs/${res1.body}`).send();
         expect(resApagada.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
         expect(resApagada.body).toHaveProperty('errors.default');
     });

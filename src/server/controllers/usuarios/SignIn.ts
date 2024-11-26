@@ -52,6 +52,6 @@ export const signIn = async (
                 },
             });
         }
-        return res.status(StatusCodes.OK).json({ accessToken });
+        return res.status(StatusCodes.OK).json({ accessToken, usuario });
     }
 };
