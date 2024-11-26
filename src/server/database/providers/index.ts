@@ -1,3 +1,2 @@
-export * from './cidades';
-export * from './pessoas';
+export * from './jobs';
 export * from './usuarios';

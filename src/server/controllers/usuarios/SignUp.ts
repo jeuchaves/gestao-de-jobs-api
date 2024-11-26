@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { object, string } from 'yup';
+import { date, object, string } from 'yup';
 
 import { UsuariosProvider } from '../../database/providers';
 import { validation } from '../../shared/middleware';
@@ -11,9 +11,15 @@ interface IBodyProps extends Omit<IUsuario, 'id'> {}
 export const signUpValidation = validation((getSchema) => ({
     body: getSchema<IBodyProps>(
         object({
-            username: string().required().min(3),
+            nomeCompleto: string().required().min(3),
             email: string().required().email().min(5),
             senha: string().required().min(6),
+            role: string().oneOf(['admin', 'collaborator', 'guest']).required(),
+            sector: string()
+                .oneOf(['digital', 'creative', 'finance', 'customer_service'])
+                .required(),
+            createdAt: date().optional(),
+            updatedAt: date().optional(),
         })
     ),
 }));
