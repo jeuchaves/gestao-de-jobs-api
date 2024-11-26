@@ -18,7 +18,7 @@ describe('Jobs - UpdateById', () => {
             .post('/entrar')
             .send({ email: usuario.email, senha: usuario.senha });
         accessToken = signInRes.body.accessToken;
-        responsibleId = signInRes.body.user.id;
+        responsibleId = signInRes.body.usuario.id;
     });
 
     it('Atualiza registro', async () => {
