@@ -38,7 +38,7 @@ describe('Jobs - UpdateById', () => {
         expect(res1.statusCode).toEqual(StatusCodes.CREATED);
 
         const resAtualizada = await testServer
-            .put(`/jobs/${res1.body}`)
+            .patch(`/jobs/${res1.body}`)
             .set({ Authorization: `Bearer ${accessToken}` })
             .send({
                 ...newJob,
@@ -58,7 +58,7 @@ describe('Jobs - UpdateById', () => {
             responsibleId: responsibleId ?? 0,
         };
         const res1 = await testServer
-            .put('/jobs/99999')
+            .patch('/jobs/99999')
             .set({ Authorization: `Bearer ${accessToken}` })
             .send(newJob);
         expect(res1.statusCode).toEqual(StatusCodes.INTERNAL_SERVER_ERROR);
@@ -81,10 +81,12 @@ describe('Jobs - UpdateById', () => {
             .send(newJob);
         expect(res1.statusCode).toEqual(StatusCodes.CREATED);
 
-        const resAtualizada = await testServer.put(`/jobs/${res1.body}`).send({
-            ...newJob,
-            title: 'Teste de atualização não autenticado',
-        });
+        const resAtualizada = await testServer
+            .patch(`/jobs/${res1.body}`)
+            .send({
+                ...newJob,
+                title: 'Teste de atualização não autenticado',
+            });
         expect(resAtualizada.statusCode).toEqual(StatusCodes.UNAUTHORIZED);
         expect(resAtualizada.body).toHaveProperty('errors.default');
     });

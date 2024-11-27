@@ -9,7 +9,7 @@ import { JobsProvider } from '../../database/providers';
 interface IParamProps {
     id?: number;
 }
-interface IBodyProps extends Omit<IJob, 'id'> {}
+interface IBodyProps extends Partial<Omit<IJob, 'id'>> {}
 
 export const updateByIdValidation = validation((getSchema) => ({
     params: getSchema<IParamProps>(
@@ -19,18 +19,18 @@ export const updateByIdValidation = validation((getSchema) => ({
     ),
     body: getSchema<IBodyProps>(
         object({
-            nDoc: string().required(),
-            title: string().required(),
-            project: string().required(),
-            status: string().required(),
+            nDoc: string().optional(),
+            title: string().optional(),
+            project: string().optional(),
+            status: string().optional(),
             jobSituation: string().optional(),
-            deadline: date().required(),
-            responsibleId: number().required(),
+            deadline: date().optional(),
+            responsibleId: number().optional(),
             estimatedComplexity: string()
                 .oneOf(['simple', 'regular', 'complex'])
                 .optional(),
-            isChangeRequest: boolean().required(),
-            timeSheet: number().required(),
+            isChangeRequest: boolean().optional(),
+            timeSheet: number().optional(),
             actualComplexity: string()
                 .oneOf(['simple', 'regular', 'complex'])
                 .optional(),
@@ -53,7 +53,19 @@ export const updateById = async (
         });
     }
 
-    const result = await JobsProvider.updateById(req.params.id, req.body);
+    const fieldsToUpdate: Partial<IBodyProps> = Object.fromEntries(
+        Object.entries(req.body).filter(([, value]) => value !== undefined)
+    );
+
+    if (Object.keys(fieldsToUpdate).length === 0) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            errors: {
+                default: 'Nenhum campo válido foi enviado para atualização',
+            },
+        });
+    }
+
+    const result = await JobsProvider.updateById(req.params.id, fieldsToUpdate);
     if (result instanceof Error) {
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             errors: {

@@ -4,7 +4,7 @@ import { Knex } from '../../knex';
 
 export const updateById = async (
     id: number,
-    job: Omit<IJob, 'id'>
+    job: Partial<Omit<IJob, 'id'>>
 ): Promise<void | Error> => {
     try {
         const result = await Knex(ETableNames.job)

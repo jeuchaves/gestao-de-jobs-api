@@ -80,9 +80,9 @@ describe('Jobs - Create', () => {
             .set({ Authorization: `Bearer ${accessToken}` })
             .send({});
         expect(res1.statusCode).toEqual(StatusCodes.BAD_REQUEST);
-        expect(res1.body).toHaveProperty('errors.body.email');
-        expect(res1.body).toHaveProperty('errors.body.cidadeId');
-        expect(res1.body).toHaveProperty('errors.body.nomeCompleto');
+        expect(res1.body).toHaveProperty('errors.body.nDoc');
+        expect(res1.body).toHaveProperty('errors.body.title');
+        expect(res1.body).toHaveProperty('errors.body.project');
     });
 
     it('Tenta criar registro não estando autenticado', async () => {

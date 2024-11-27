@@ -26,7 +26,7 @@ jobsRouter
         JobsController.getByIdValidation,
         JobsController.getById
     )
-    .put(
+    .patch(
         '/jobs/:id',
         ensureAuthenticated,
         JobsController.updateByIdValidation,
