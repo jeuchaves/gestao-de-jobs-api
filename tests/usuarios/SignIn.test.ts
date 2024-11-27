@@ -3,7 +3,7 @@ import { testServer } from '../jest.setup';
 
 describe('Usuarios - Sign In', () => {
     beforeAll(async () => {
-        await testServer.post('/cadastrar').send({
+        await testServer.post('/auth/signup').send({
             nomeCompleto: 'João Carlos',
             email: 'joao.carlos.signin@gmail.com',
             senha: '123456',
@@ -12,7 +12,7 @@ describe('Usuarios - Sign In', () => {
         });
     });
     it('Faz login', async () => {
-        const res1 = await testServer.post('/entrar').send({
+        const res1 = await testServer.post('/auth/login').send({
             email: 'joao.carlos.signin@gmail.com',
             senha: '123456',
         });
@@ -21,7 +21,7 @@ describe('Usuarios - Sign In', () => {
     });
 
     it('Faz login com e-mail que não existe', async () => {
-        const res1 = await testServer.post('/entrar').send({
+        const res1 = await testServer.post('/auth/login').send({
             email: 'joao.carlos.inexistente@gmail.com',
             senha: '123456',
         });
@@ -30,7 +30,7 @@ describe('Usuarios - Sign In', () => {
     });
 
     it('Faz login com e-mail inválido', async () => {
-        const res1 = await testServer.post('/entrar').send({
+        const res1 = await testServer.post('/auth/login').send({
             email: 'joao.carlos gmail.com',
             senha: '123456',
         });
@@ -39,7 +39,7 @@ describe('Usuarios - Sign In', () => {
     });
 
     it('Faz login com senha errada', async () => {
-        const resBuscado = await testServer.post('/entrar').send({
+        const resBuscado = await testServer.post('/auth/login').send({
             email: 'joao.carlos.signin@gmail.com',
             senha: '12345678',
         });

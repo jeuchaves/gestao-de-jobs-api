@@ -480,7 +480,7 @@
                 }
             }
         },
-        "/entrar": {
+        "/auth/login": {
             "post": {
                 "summary": "Autentica um usuário",
                 "tags": ["Usuários"],
@@ -517,7 +517,7 @@
                 }
             }
         },
-        "/cadastrar": {
+        "/auth/signup": {
             "post": {
                 "summary": "Registra um novo usuário",
                 "tags": ["Usuários"],

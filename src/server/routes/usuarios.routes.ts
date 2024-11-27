@@ -4,13 +4,13 @@ import { UsuariosController } from '../controllers';
 const usuariosRouter = Router();
 
 usuariosRouter.post(
-    '/entrar',
+    '/auth/login',
     UsuariosController.signInValidation,
     UsuariosController.signIn
 );
 
 usuariosRouter.post(
-    '/cadastrar',
+    '/auth/signup',
     UsuariosController.signUpValidation,
     UsuariosController.signUp
 );

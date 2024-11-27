@@ -13,9 +13,9 @@ describe('Jobs - Create', () => {
             role: 'admin',
             sector: 'digital',
         };
-        await testServer.post('/cadastrar').send(usuario);
+        await testServer.post('/auth/signup').send(usuario);
         const signInRes = await testServer
-            .post('/entrar')
+            .post('/auth/login')
             .send({ email: usuario.email, senha: usuario.senha });
         accessToken = signInRes.body.accessToken;
         responsibleId = signInRes.body.usuario.id;
@@ -53,7 +53,7 @@ describe('Jobs - Create', () => {
             .set({ Authorization: `Bearer ${accessToken}` })
             .send(newJobWithoutNDoc);
         expect(res1.statusCode).toEqual(StatusCodes.BAD_REQUEST);
-        expect(res1.body).toHaveProperty('errors.body.nomeCompleto');
+        expect(res1.body).toHaveProperty('errors.body.nDoc');
     });
 
     it('Tenta criar registro com responsibleId inválido', async () => {
@@ -70,8 +70,8 @@ describe('Jobs - Create', () => {
             .post('/jobs')
             .set({ Authorization: `Bearer ${accessToken}` })
             .send(newJob);
-        expect(res1.statusCode).toEqual(StatusCodes.BAD_REQUEST);
-        expect(res1.body).toHaveProperty('errors.body.cidadeId');
+        expect(res1.statusCode).toEqual(StatusCodes.INTERNAL_SERVER_ERROR);
+        expect(res1.body).toHaveProperty('errors.default');
     });
 
     it('Tenta criar registro sem nenhuma propriedade', async () => {

@@ -6,6 +6,14 @@ export const create = async (
     job: IJobCreatePayload
 ): Promise<number | Error> => {
     try {
+        const [{ count }] = await Knex(ETableNames.usuario)
+            .where('id', '=', job.responsibleId)
+            .count<[{ count: number }]>('* as count');
+
+        if (count === 0) {
+            return new Error('O usuário responsável não foi encontrado');
+        }
+
         const [result] = await Knex(ETableNames.job)
             .insert(job)
             .returning('id');

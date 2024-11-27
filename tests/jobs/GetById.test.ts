@@ -13,9 +13,9 @@ describe('Jobs - GetById', () => {
             role: 'admin',
             sector: 'digital',
         };
-        await testServer.post('/cadastrar').send(usuario);
+        await testServer.post('/auth/signup').send(usuario);
         const signInRes = await testServer
-            .post('/entrar')
+            .post('/auth/login')
             .send({ email: usuario.email, senha: usuario.senha });
         accessToken = signInRes.body.accessToken;
         responsibleId = signInRes.body.usuario.id;
