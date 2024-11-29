@@ -5,6 +5,13 @@ import { JobsController } from '../controllers';
 
 const jobsRouter = Router();
 
+jobsRouter.post(
+    '/jobs/many',
+    ensureAuthenticated,
+    JobsController.createManyValidation,
+    JobsController.createMany
+);
+
 jobsRouter
     .get(
         '/jobs',
