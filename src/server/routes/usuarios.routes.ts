@@ -3,6 +3,8 @@ import { UsuariosController } from '../controllers';
 
 const usuariosRouter = Router();
 
+usuariosRouter.get('/usuarios', UsuariosController.getAll);
+
 usuariosRouter.post(
     '/auth/login',
     UsuariosController.signInValidation,

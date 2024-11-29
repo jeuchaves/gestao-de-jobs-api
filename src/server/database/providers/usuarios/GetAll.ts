@@ -1,16 +1,16 @@
 import { ETableNames } from '../../ETableNames';
-import { IJob } from '../../models';
 import { Knex } from '../../knex';
+import { IUsuario } from '../../models';
 
 export const getAll = async (
     page: number,
     limit: number,
     filter: string
-): Promise<IJob[] | Error> => {
+): Promise<IUsuario[] | Error> => {
     try {
-        const result = await Knex(ETableNames.job)
+        const result = await Knex(ETableNames.usuario)
             .select('*')
-            .orWhere('title', 'like', `%${filter}%`)
+            .orWhere('nomeCompleto', 'like', `%${filter}%`)
             .offset((page - 1) * limit)
             .limit(limit);
 
