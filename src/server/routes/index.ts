@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { jobsRouter } from './jobs.routes';
+import { authRouter } from './auth.routes';
 import { usuariosRouter } from './usuarios.routes';
 
 const router = Router();
@@ -9,6 +10,7 @@ router.get('/', (_, res) => {
 });
 
 router.use(jobsRouter);
+router.use(authRouter);
 router.use(usuariosRouter);
 
 export { router };
