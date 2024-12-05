@@ -9,8 +9,16 @@ export const getAll = async (
 ): Promise<IJob[] | Error> => {
     try {
         const result = await Knex(ETableNames.job)
-            .select('*')
-            .orWhere('title', 'like', `%${filter}%`)
+            .select(
+                `${ETableNames.job}.*`,
+                `${ETableNames.usuario}.nomeCompleto as responsibleName`
+            )
+            .join(
+                ETableNames.usuario,
+                `${ETableNames.job}.responsibleId`,
+                `${ETableNames.usuario}.id`
+            )
+            .where(`${ETableNames.job}.title`, 'like', `%${filter}%`)
             .offset((page - 1) * limit)
             .limit(limit);
 
