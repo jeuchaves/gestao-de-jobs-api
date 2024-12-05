@@ -8,7 +8,7 @@ export const seed = async (knex: Knex) => {
     >('* as count');
     if (!Number.isInteger(count) || Number(count) > 0) return;
 
-    const hashedPassword = await PasswordCrypto.hashPassword('admin');
+    const hashedPassword = await PasswordCrypto.hashPassword('123456789');
 
     const user = {
         nomeCompleto: 'Admin',

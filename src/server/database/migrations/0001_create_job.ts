@@ -10,6 +10,7 @@ export async function up(knex: Knex) {
             table.string('project').notNullable();
             table.string('status').notNullable();
             table.string('jobSituation');
+            table.string('typeDoc').notNullable();
             table.date('deadline').notNullable();
             table
                 .bigInteger('responsibleId')
