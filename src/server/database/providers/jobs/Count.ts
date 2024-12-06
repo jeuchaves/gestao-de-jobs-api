@@ -1,11 +1,23 @@
 import { ETableNames } from '../../ETableNames';
 import { Knex } from '../../knex';
 
-export const count = async (filter = ''): Promise<number | Error> => {
+export const count = async (
+    filter = '',
+    completed?: boolean
+): Promise<number | Error> => {
     try {
-        const [{ count }] = await Knex(ETableNames.job)
-            .where('title', 'like', `%${filter}%`)
-            .count<[{ count: number }]>('* as count');
+        const query = Knex(ETableNames.job).where(
+            'title',
+            'like',
+            `%${filter}%`
+        );
+
+        if (completed !== undefined) {
+            query.andWhere('timeSheet', completed ? '>' : '=', 0);
+        }
+
+        const [{ count }] =
+            await query.count<[{ count: number }]>('* as count');
 
         if (Number.isInteger(Number(count))) return Number(count);
 

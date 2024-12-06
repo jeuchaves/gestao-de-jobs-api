@@ -5,10 +5,11 @@ import { Knex } from '../../knex';
 export const getAll = async (
     page: number,
     limit: number,
-    filter: string
+    filter: string,
+    completed?: boolean
 ): Promise<IJob[] | Error> => {
     try {
-        const result = await Knex(ETableNames.job)
+        const query = Knex(ETableNames.job)
             .select(
                 `${ETableNames.job}.*`,
                 `${ETableNames.usuario}.nomeCompleto as responsibleName`
@@ -21,6 +22,12 @@ export const getAll = async (
             .where(`${ETableNames.job}.title`, 'like', `%${filter}%`)
             .offset((page - 1) * limit)
             .limit(limit);
+
+        if (completed) {
+            query.andWhere(`${ETableNames.job}.timeSheet`, '>', 0);
+        }
+
+        const result = await query;
 
         return result;
     } catch (error) {
