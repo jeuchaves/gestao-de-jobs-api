@@ -3,7 +3,7 @@ import { Knex } from '../../knex';
 
 export const count = async (
     filter = '',
-    completed?: boolean
+    completed: boolean
 ): Promise<number | Error> => {
     try {
         const query = Knex(ETableNames.job).where(
@@ -12,9 +12,7 @@ export const count = async (
             `%${filter}%`
         );
 
-        if (completed !== undefined) {
-            query.andWhere('timeSheet', completed ? '>' : '=', 0);
-        }
+        query.andWhere('timeSheet', completed ? '>' : '=', 0);
 
         const [{ count }] =
             await query.count<[{ count: number }]>('* as count');

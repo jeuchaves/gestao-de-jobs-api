@@ -6,7 +6,7 @@ export const getAll = async (
     page: number,
     limit: number,
     filter: string,
-    completed?: boolean
+    completed: boolean
 ): Promise<IJob[] | Error> => {
     try {
         const query = Knex(ETableNames.job)
@@ -20,12 +20,15 @@ export const getAll = async (
                 `${ETableNames.usuario}.id`
             )
             .where(`${ETableNames.job}.title`, 'like', `%${filter}%`)
+            .orderBy(`${ETableNames.job}.deadline`, 'desc')
             .offset((page - 1) * limit)
             .limit(limit);
 
-        if (completed) {
-            query.andWhere(`${ETableNames.job}.timeSheet`, '>', 0);
-        }
+        query.andWhere(
+            `${ETableNames.job}.timeSheet`,
+            completed ? '>' : '=',
+            0
+        );
 
         const result = await query;
 

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { boolean, number, object, string } from 'yup';
+import { number, object, string } from 'yup';
 
 import { validation } from '../../shared/middleware';
 import { JobsProvider } from '../../database/providers';
@@ -9,7 +9,7 @@ interface IQueryProps {
     page?: number;
     limit?: number;
     filter?: string;
-    completed?: boolean;
+    completed?: string;
 }
 
 export const getAllValidation = validation((getSchema) => ({
@@ -18,7 +18,7 @@ export const getAllValidation = validation((getSchema) => ({
             page: number().moreThan(0),
             limit: number().moreThan(0),
             filter: string(),
-            completed: boolean(),
+            completed: string().matches(/^(true|false)$/),
         })
     ),
 }));
@@ -27,13 +27,18 @@ export const getAll = async (
     req: Request<{}, {}, {}, IQueryProps>,
     res: Response
 ) => {
+    const completed =
+        req.query.completed === undefined
+            ? false
+            : req.query.completed === 'true';
+
     const result = await JobsProvider.getAll(
         req.query.page || 1,
         req.query.limit || 10,
         req.query.filter || '',
-        req.query.completed
+        completed
     );
-    const count = await JobsProvider.count(req.query.filter);
+    const count = await JobsProvider.count(req.query.filter, completed);
 
     if (result instanceof Error) {
         return res
