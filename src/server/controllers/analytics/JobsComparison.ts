@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import { object, string } from 'yup';
 
 import { validation } from '../../shared/middleware';
+import { AnalyticsProvider } from '../../database/providers';
 
 interface IQueryProps {
     startDate?: string;
@@ -77,7 +78,17 @@ export const jobsComparison = async (
     req: Request<{}, {}, {}, IQueryProps>,
     res: Response
 ) => {
-    console.log(req.query);
+    const { startDate, endDate, startDateComparison, endDateComparison } =
+        req.query;
 
-    return res.status(StatusCodes.OK).json({ message: 'Testando' });
+    if (!startDate || !endDate || !startDateComparison || !endDateComparison) {
+        return res
+            .status(StatusCodes.BAD_REQUEST)
+            .json({ errors: { message: 'Parâmetros inválidos.' } });
+    }
+
+    return res.status(StatusCodes.OK).json({
+        total: 100,
+        comparison: 50,
+    });
 };
