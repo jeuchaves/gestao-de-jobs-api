@@ -87,8 +87,18 @@ export const jobsComparison = async (
             .json({ errors: { message: 'Parâmetros inválidos.' } });
     }
 
-    return res.status(StatusCodes.OK).json({
-        total: 100,
-        comparison: 50,
-    });
+    const result = await AnalyticsProvider.jobsComparison(
+        startDate,
+        endDate,
+        startDateComparison,
+        endDateComparison
+    );
+
+    if (result instanceof Error) {
+        return res
+            .status(StatusCodes.INTERNAL_SERVER_ERROR)
+            .send(result.message);
+    }
+
+    return res.status(StatusCodes.OK).json(result);
 };

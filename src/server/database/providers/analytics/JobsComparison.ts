@@ -15,11 +15,11 @@ export const jobsComparison = async (
     try {
         const totalQuery = Knex(ETableNames.job)
             .count('* as total')
-            .whereBetween('createdAt', [startDate, endDate]);
+            .whereBetween('created_at', [startDate, endDate]);
 
         const comparisonQuery = Knex(ETableNames.job)
             .count('* as comparison')
-            .whereBetween('createdAt', [
+            .whereBetween('created_at', [
                 startDateComparison,
                 endDateComparison,
             ]);
