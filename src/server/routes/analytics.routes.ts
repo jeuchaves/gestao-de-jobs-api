@@ -7,8 +7,15 @@ const analyticsRouter = Router();
 analyticsRouter.get(
     '/analytics/jobs-comparison',
     ensureAuthenticated,
-    AnalyticsController.jobsComparisonValidation,
+    AnalyticsController.analyticsValidation,
     AnalyticsController.jobsComparison
+);
+
+analyticsRouter.get(
+    '/analytics/jobs-average-time',
+    ensureAuthenticated,
+    AnalyticsController.analyticsValidation,
+    AnalyticsController.jobsAverageTime
 );
 
 export { analyticsRouter };

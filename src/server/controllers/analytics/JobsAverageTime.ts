@@ -1,10 +1,9 @@
 import { Request, Response } from 'express';
-import { StatusCodes } from 'http-status-codes';
-
-import { AnalyticsProvider } from '../../database/providers';
 import { IQueryAnalyticsProps } from './Analytics';
+import { StatusCodes } from 'http-status-codes';
+import { AnalyticsProvider } from '../../database/providers';
 
-export const jobsComparison = async (
+export const jobsAverageTime = async (
     req: Request<{}, {}, {}, IQueryAnalyticsProps>,
     res: Response
 ) => {
@@ -17,7 +16,7 @@ export const jobsComparison = async (
             .json({ errors: { message: 'Parâmetros inválidos.' } });
     }
 
-    const result = await AnalyticsProvider.jobsComparison(
+    const result = await AnalyticsProvider.jobsAverageTime(
         startDate,
         endDate,
         startDateComparison,
