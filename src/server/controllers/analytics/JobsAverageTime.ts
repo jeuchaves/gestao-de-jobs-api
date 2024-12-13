@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { IQueryAnalyticsProps } from './Analytics';
+import { IQueryAnalyticsProps } from './AnalyticsWithComparison';
 import { StatusCodes } from 'http-status-codes';
 import { AnalyticsProvider } from '../../database/providers';
 

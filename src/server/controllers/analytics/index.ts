@@ -1,9 +1,13 @@
 import * as jobsComparison from './JobsComparison';
 import * as jobsAverageTime from './JobsAverageTime';
-import * as analytics from './Analytics';
+import * as jobsChangePercentage from './JobsChangePercentage';
+import * as analyticsWithComparison from './AnalyticsWithComparison';
+import * as userJobsStats from './UserJobsStats';
 
 export const AnalyticsController = {
     ...jobsComparison,
-    ...analytics,
+    ...analyticsWithComparison,
     ...jobsAverageTime,
+    ...jobsChangePercentage,
+    ...userJobsStats,
 };

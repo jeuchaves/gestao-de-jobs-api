@@ -18,4 +18,18 @@ analyticsRouter.get(
     AnalyticsController.jobsAverageTime
 );
 
+analyticsRouter.get(
+    '/analytics/jobs-change-percentage',
+    ensureAuthenticated,
+    AnalyticsController.analyticsValidation,
+    AnalyticsController.jobsChangePercentage
+);
+
+analyticsRouter.get(
+    '/analytics/user-jobs-stats',
+    ensureAuthenticated,
+    AnalyticsController.userJobsStatsValidation,
+    AnalyticsController.userJobsStats
+);
+
 export { analyticsRouter };
