@@ -8,7 +8,10 @@ export const updateById = async (
 ): Promise<void | Error> => {
     try {
         const result = await Knex(ETableNames.job)
-            .update(job)
+            .update({
+                ...job,
+                updated_at: Knex.fn.now(),
+            })
             .where('id', '=', id);
 
         if (result > 0) return;
