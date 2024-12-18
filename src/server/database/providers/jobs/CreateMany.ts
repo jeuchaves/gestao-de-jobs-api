@@ -1,10 +1,12 @@
 import { ETableNames } from '../../ETableNames';
 import { Knex } from '../../knex';
-import { IJobCreatePayload } from '../../models';
+import { IJob, IJobCreatePayload } from '../../models';
 
 export const createMany = async (
     jobs: IJobCreatePayload[]
-): Promise<number[] | Error> => {
+): Promise<
+    { insertedIds: number[]; duplicates: IJobCreatePayload[] } | Error
+> => {
     try {
         const responsibleIds = [
             ...new Set(jobs.map((job) => job.responsibleId)),
@@ -29,13 +31,53 @@ export const createMany = async (
             );
         }
 
+        // Identificação de jobs duplicados no banco
+        const existingJobs = await Knex(ETableNames.job)
+            .whereIn(
+                'nDoc',
+                jobs.map((job) => job.nDoc)
+            )
+            .andWhere((builder) => {
+                builder
+                    .whereIn(
+                        'title',
+                        jobs.map((job) => job.title)
+                    )
+                    .whereIn(
+                        'typeDoc',
+                        jobs.map((job) => job.typeDoc || null)
+                    );
+            })
+            .select('*');
+
+        const existingSet = new Set(
+            existingJobs.map(
+                (job: IJob) => `${job.nDoc}-${job.title}-${job.typeDoc}`
+            )
+        );
+
+        const uniqueJobs = jobs.filter(
+            (job) => !existingSet.has(`${job.nDoc}-${job.title}-${job.typeDoc}`)
+        );
+
+        const duplicates = jobs.filter((job) =>
+            existingSet.has(`${job.nDoc}-${job.title}-${job.typeDoc}`)
+        );
+
+        if (uniqueJobs.length === 0) {
+            return { insertedIds: [], duplicates };
+        }
+
         const results = await Knex(ETableNames.job)
-            .insert(jobs)
+            .insert(uniqueJobs)
             .returning('id');
 
-        return results.map((result) =>
-            typeof result === 'object' ? result.id : result
-        );
+        return {
+            insertedIds: results.map((result) =>
+                typeof result === 'object' ? result.id : result
+            ),
+            duplicates,
+        };
     } catch (error) {
         console.log(error);
         return Error('Erro ao cadastrar o registro');
