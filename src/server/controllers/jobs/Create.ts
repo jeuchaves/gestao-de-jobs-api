@@ -18,6 +18,7 @@ export const createValidation = validation((getSchema) => ({
             jobSituation: string().optional(),
             deadline: date().required(),
             responsibleId: number().required(),
+            typeDoc: string().optional(),
         })
     ),
 }));

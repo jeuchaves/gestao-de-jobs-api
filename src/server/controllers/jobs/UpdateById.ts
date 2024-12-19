@@ -37,6 +37,7 @@ export const updateByIdValidation = validation((getSchema) => ({
             contingencies: string().optional(),
             createdAt: date().optional(),
             updatedAt: date().optional(),
+            typeDoc: string().optional(),
         })
     ),
 }));

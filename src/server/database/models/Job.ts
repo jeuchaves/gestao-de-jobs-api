@@ -7,6 +7,7 @@ export interface IJob {
     project: string;
     status: string;
     jobSituation?: string;
+    typeDoc?: string;
     deadline: Date;
     responsibleId: number;
     estimatedComplexity?: TComplexity;
@@ -28,4 +29,5 @@ export interface IJobCreatePayload
         | 'jobSituation'
         | 'deadline'
         | 'responsibleId'
+        | 'typeDoc'
     > {}

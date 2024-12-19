@@ -20,6 +20,7 @@ export const createManyValidation = validation((getSchema) => ({
                     jobSituation: string().optional(),
                     deadline: date().required(),
                     responsibleId: number().required(),
+                    typeDoc: string().optional(),
                 })
             ).required(),
         })
@@ -32,11 +33,28 @@ export const createMany = async (
 ) => {
     const { jobs } = req.body;
 
-    const result = await JobsProvider.createMany(jobs);
-    if (result instanceof Error) {
-        return res
-            .status(StatusCodes.INTERNAL_SERVER_ERROR)
-            .json({ errors: { default: result.message } });
+    try {
+        const result = await JobsProvider.createMany(jobs);
+
+        if (result instanceof Error) {
+            return res
+                .status(StatusCodes.INTERNAL_SERVER_ERROR)
+                .json({ errors: { default: result.message } });
+        }
+
+        const { insertedIds, duplicates } = result;
+
+        return res.status(StatusCodes.CREATED).json({
+            message: 'Processamento concluído.',
+            insertedIds,
+            duplicates,
+        });
+    } catch (error) {
+        console.error('Erro ao criar jobs:', error);
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            errors: {
+                default: 'Erro inesperado ao processar a solicitação.',
+            },
+        });
     }
-    return res.status(StatusCodes.CREATED).json(result);
 };

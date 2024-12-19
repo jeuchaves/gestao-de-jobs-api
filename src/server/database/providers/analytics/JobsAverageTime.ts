@@ -28,11 +28,6 @@ export const jobsAverageTime = async (
             .avg('timeSheet as comparison_average_time_sheet')
             .first();
 
-        console.log(
-            averageTimeSheet?.average_time_sheet,
-            comparisonAverageTimeSheet?.comparison_average_time_sheet
-        );
-
         const averageTime = averageTimeSheet?.average_time_sheet ?? 0;
         const comparisonAverageTime =
             comparisonAverageTimeSheet?.comparison_average_time_sheet ?? 0;
