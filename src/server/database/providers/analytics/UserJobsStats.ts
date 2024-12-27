@@ -27,10 +27,10 @@ export const userJobsStats = async (
 
         const totalJobs = Number(totalJobsQuery?.total) || 0;
 
-        // Total de jobs concluídos no período (timesheet > 0)
+        // Total de jobs concluídos no período (timeSheet > 0)
         const totalCompletedJobsQuery = await Knex(ETableNames.job)
             .count('id as total')
-            .where('timesheet', '>', 0)
+            .where('timeSheet', '>', 0)
             .whereBetween('created_at', [startDate, endDate])
             .first();
 
