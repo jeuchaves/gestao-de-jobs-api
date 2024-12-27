@@ -59,8 +59,6 @@ export const userJobsStats = async (
                 `${ETableNames.usuario}.nomeCompleto`
             );
 
-        console.log(userStatsQuery);
-
         const users: IUserJobStats[] = userStatsQuery.map(
             (user: {
                 userId: number;
