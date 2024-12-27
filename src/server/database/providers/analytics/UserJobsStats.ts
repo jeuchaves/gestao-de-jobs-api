@@ -59,17 +59,19 @@ export const userJobsStats = async (
                 `${ETableNames.usuario}.nomeCompleto`
             );
 
+        console.log(userStatsQuery);
+
         const users: IUserJobStats[] = userStatsQuery.map(
             (user: {
                 userId: number;
                 nomeCompleto: string;
-                totalCompletedJobs: number;
-                totalJobs: number;
+                totalcompletedjobs: number;
+                totaljobs: number;
             }) => ({
                 userId: user.userId,
                 nomeCompleto: user.nomeCompleto,
-                totalCompletedJobs: user.totalCompletedJobs,
-                totalJobs: user.totalJobs,
+                totalCompletedJobs: user.totalcompletedjobs,
+                totalJobs: user.totaljobs,
             })
         );
 
