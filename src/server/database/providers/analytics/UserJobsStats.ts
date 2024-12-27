@@ -42,7 +42,7 @@ export const userJobsStats = async (
                 `${ETableNames.usuario}.id as userId`,
                 `${ETableNames.usuario}.nomeCompleto`,
                 Knex.raw(
-                    `COALESCE(SUM(CASE WHEN ${ETableNames.job}.timeSheet > 0 THEN 1 ELSE 0 END), 0) as totalCompletedJobs`
+                    `COALESCE(SUM(CASE WHEN ${ETableNames.job}."timeSheet" > 0 THEN 1 ELSE 0 END), 0) as totalCompletedJobs`
                 ),
                 Knex.raw(
                     `COALESCE(COUNT(${ETableNames.job}.id), 0) as totalJobs`
