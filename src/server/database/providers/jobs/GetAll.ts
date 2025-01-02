@@ -20,7 +20,7 @@ export const getAll = async (
                 `${ETableNames.usuario}.id`
             )
             .where(`${ETableNames.job}.title`, 'like', `%${filter}%`)
-            .orderBy(`${ETableNames.job}.deadline`, 'desc')
+            .orderBy(`${ETableNames.job}.deadline`, 'asc')
             .offset((page - 1) * limit)
             .limit(limit);
 
