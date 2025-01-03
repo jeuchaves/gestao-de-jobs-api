@@ -12,6 +12,13 @@ analyticsRouter.get(
 );
 
 analyticsRouter.get(
+    '/analytics/completed-jobs',
+    ensureAuthenticated,
+    AnalyticsController.analyticsValidation,
+    AnalyticsController.completedJobs
+);
+
+analyticsRouter.get(
     '/analytics/jobs-average-time',
     ensureAuthenticated,
     AnalyticsController.analyticsValidation,
