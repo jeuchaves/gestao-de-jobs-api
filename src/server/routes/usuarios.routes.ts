@@ -11,4 +11,11 @@ usuariosRouter.get(
     UsuariosController.getAll
 );
 
+usuariosRouter.put(
+    '/usuarios/:id',
+    ensureAuthenticated,
+    UsuariosController.updateByIdValidation,
+    UsuariosController.updateById
+);
+
 export { usuariosRouter };
