@@ -56,5 +56,5 @@ export const updateById = async (
             },
         });
     }
-    return res.status(StatusCodes.NO_CONTENT);
+    return res.status(StatusCodes.NO_CONTENT).json({});
 };
