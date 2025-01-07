@@ -6,7 +6,8 @@ export const getAll = async (
     page: number,
     limit: number,
     filter: string,
-    completed: boolean
+    completed: boolean,
+    userId?: number
 ): Promise<IJob[] | Error> => {
     try {
         const query = Knex(ETableNames.job)
@@ -29,6 +30,10 @@ export const getAll = async (
             completed ? '>' : '=',
             0
         );
+
+        if (userId) {
+            query.andWhere(`${ETableNames.job}.responsibleId`, '=', userId);
+        }
 
         const result = await query;
 
