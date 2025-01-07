@@ -10,6 +10,7 @@ interface IQueryProps {
     limit?: number;
     filter?: string;
     completed?: string;
+    userId?: number;
 }
 
 export const getAllValidation = validation((getSchema) => ({
@@ -19,6 +20,7 @@ export const getAllValidation = validation((getSchema) => ({
             limit: number().moreThan(0),
             filter: string(),
             completed: string().matches(/^(true|false)$/),
+            userId: number().moreThan(0),
         })
     ),
 }));
@@ -36,7 +38,8 @@ export const getAll = async (
         req.query.page || 1,
         req.query.limit || 10,
         req.query.filter || '',
-        completed
+        completed,
+        req.query.userId
     );
     const count = await JobsProvider.count(req.query.filter, completed);
 
