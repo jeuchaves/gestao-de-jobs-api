@@ -5,10 +5,9 @@ import { AnalyticsController } from '../controllers';
 const analyticsRouter = Router();
 
 analyticsRouter.get(
-    '/analytics/jobs-comparison',
+    '/analytics/remaining-jobs',
     ensureAuthenticated,
-    AnalyticsController.analyticsValidation,
-    AnalyticsController.jobsComparison
+    AnalyticsController.remainingJobs
 );
 
 analyticsRouter.get(
