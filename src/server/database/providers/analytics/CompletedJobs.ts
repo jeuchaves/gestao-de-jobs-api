@@ -13,25 +13,31 @@ export const completedJobs = async (
     endDateComparison: string
 ): Promise<IJobComparison | Error> => {
     try {
-        const totalQuery = Knex(ETableNames.job)
+        const totalQuery = await Knex(ETableNames.job)
+            .where('timeSheet', '>', 0)
+            .whereRaw('updated_at::date BETWEEN ?::date AND ?::date', [
+                startDate,
+                endDate,
+            ])
             .count('* as total')
-            .where('timeSheet', '>', 0)
-            .whereBetween('created_at', [startDate, endDate]);
+            .first();
 
-        const comparisonQuery = Knex(ETableNames.job)
-            .count('* as comparison')
+        const comparisonQuery = await Knex(ETableNames.job)
             .where('timeSheet', '>', 0)
-            .whereBetween('created_at', [
+            .whereRaw('updated_at::date BETWEEN ?::date AND ?::date', [
                 startDateComparison,
                 endDateComparison,
-            ]);
+            ])
+            .count('* as total')
+            .first();
 
-        const [totalResult] = await totalQuery;
-        const [comparisonResult] = await comparisonQuery;
+        // Convertendo os resultados
+        const completedJobs = Number(totalQuery?.total) || 0;
+        const completedJobsComparison = Number(comparisonQuery?.total) || 0;
 
         return {
-            total: totalResult.total,
-            comparison: comparisonResult.comparison,
+            total: completedJobs,
+            comparison: completedJobsComparison,
         } as IJobComparison;
     } catch (error) {
         console.error(error);
