@@ -9,27 +9,32 @@ interface IJobsChangePercentage {
 
 export const jobsChangePercentage = async (
     startDate: string,
-    endDate: string
+    endDate: string,
+    responsibleId?: number
 ): Promise<IJobsChangePercentage | Error> => {
     try {
+        // Base query para ambos os casos
+        const baseQuery = () => {
+            let query = Knex(ETableNames.job)
+                .where('timeSheet', '>', 0)
+                .whereRaw('updated_at::date BETWEEN ?::date AND ?::date', [
+                    startDate,
+                    endDate,
+                ]);
+
+            if (responsibleId !== undefined) {
+                query = query.where('responsibleId', responsibleId);
+            }
+
+            return query;
+        };
+
         // Total de jobs completados no período
-        const totalJobsResult = await Knex(ETableNames.job)
-            .where('timeSheet', '>', 0)
-            .whereRaw('updated_at::date BETWEEN ?::date AND ?::date', [
-                startDate,
-                endDate,
-            ])
-            .count('* as total')
-            .first();
+        const totalJobsResult = await baseQuery().count('* as total').first();
 
         // Total de jobs que são alterações no período
-        const changeJobsResult = await Knex(ETableNames.job)
-            .where('timeSheet', '>', 0)
+        const changeJobsResult = await baseQuery()
             .where('isChangeRequest', true)
-            .whereRaw('updated_at::date BETWEEN ?::date AND ?::date', [
-                startDate,
-                endDate,
-            ])
             .count('* as total')
             .first();
 

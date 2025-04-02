@@ -17,8 +17,7 @@ export const jobsAverageTime = async (
             .whereRaw('updated_at::date BETWEEN ?::date AND ?::date', [
                 startDate,
                 endDate,
-            ])
-            .avg('timeSheet as average_time_sheet');
+            ]);
 
         // Adiciona o filtro por responsibleId se ele foi fornecido
         if (responsibleId !== undefined) {
@@ -26,7 +25,9 @@ export const jobsAverageTime = async (
         }
 
         // Executa a query
-        const averageTimeSheet = await query.count('* as total').first();
+        const averageTimeSheet = await query
+            .avg('timeSheet as average_time_sheet')
+            .first();
 
         // Convertendo para número e tratando valores nulos
         const averageTime = Number(averageTimeSheet?.average_time_sheet) || 0;

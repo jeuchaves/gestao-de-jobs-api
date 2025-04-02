@@ -16,8 +16,7 @@ export const completedJobs = async (
             .whereRaw('updated_at::date BETWEEN ?::date AND ?::date', [
                 startDate,
                 endDate,
-            ])
-            .count('* as total');
+            ]);
 
         // Adiciona o filtro por responsibleId se ele foi fornecido
         if (responsibleId !== undefined) {
