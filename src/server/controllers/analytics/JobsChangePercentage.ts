@@ -18,7 +18,10 @@ export const jobsChangePercentage = async (
 
     const result = await AnalyticsProvider.jobsChangePercentage(
         startDate,
-        endDate,
+        endDate
+    );
+
+    const comparisonResult = await AnalyticsProvider.jobsChangePercentage(
         startDateComparison,
         endDateComparison
     );
@@ -29,5 +32,14 @@ export const jobsChangePercentage = async (
             .send(result.message);
     }
 
-    return res.status(StatusCodes.OK).json(result);
+    if (comparisonResult instanceof Error) {
+        return res
+            .status(StatusCodes.INTERNAL_SERVER_ERROR)
+            .send(comparisonResult.message);
+    }
+
+    return res.status(StatusCodes.OK).json({
+        changePercentage: result.changePercentage,
+        comparisonChangePercentage: comparisonResult.changePercentage,
+    });
 };
