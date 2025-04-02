@@ -13,24 +13,30 @@ export const jobsAverageTime = async (
     endDateComparison: string
 ): Promise<IJobAverageTime | Error> => {
     try {
+        // Média para o período principal
         const averageTimeSheet = await Knex(ETableNames.job)
             .where('timeSheet', '>', 0)
-            .whereBetween('created_at', [startDate, endDate])
+            .whereRaw('updated_at::date BETWEEN ?::date AND ?::date', [
+                startDate,
+                endDate,
+            ])
             .avg('timeSheet as average_time_sheet')
             .first();
 
         const comparisonAverageTimeSheet = await Knex(ETableNames.job)
             .where('timeSheet', '>', 0)
-            .whereBetween('created_at', [
+            .whereRaw('updated_at::date BETWEEN ?::date AND ?::date', [
                 startDateComparison,
                 endDateComparison,
             ])
             .avg('timeSheet as comparison_average_time_sheet')
             .first();
 
-        const averageTime = averageTimeSheet?.average_time_sheet ?? 0;
+        // Convertendo para número e tratando valores nulos
+        const averageTime = Number(averageTimeSheet?.average_time_sheet) || 0;
         const comparisonAverageTime =
-            comparisonAverageTimeSheet?.comparison_average_time_sheet ?? 0;
+            Number(comparisonAverageTimeSheet?.comparison_average_time_sheet) ||
+            0;
 
         return {
             averageTime,
