@@ -5,16 +5,25 @@ interface IRemainingJobs {
     total: number;
 }
 
-export const remainingJobs = async (): Promise<IRemainingJobs | Error> => {
+export const remainingJobs = async (
+    responsibleId?: number
+): Promise<IRemainingJobs | Error> => {
     try {
-        const totalQuery = Knex(ETableNames.job)
-            .count('* as total')
-            .where('timeSheet', '<=', 0);
+        const query = Knex(ETableNames.job).where('timeSheet', '<=', 0);
 
-        const [totalResult] = await totalQuery;
+        // Adiciona o filtro por responsibleId se ele foi fornecido
+        if (responsibleId !== undefined) {
+            query.where('responsibleId', responsibleId);
+        }
+
+        // Executa a query
+        const totalQuery = await query.count('* as total').first();
+
+        // Convertendo os resultados
+        const totalResult = Number(totalQuery?.total) || 0;
 
         return {
-            total: totalResult.total,
+            total: totalResult,
         } as IRemainingJobs;
     } catch (error) {
         console.error(error);
