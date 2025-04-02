@@ -21,6 +21,7 @@ export const jobsChangePercentage = async (
             ])
             .count('* as total')
             .first();
+
         // Total de jobs que são alterações no período
         const changeJobsResult = await Knex(ETableNames.job)
             .where('timeSheet', '>', 0)
