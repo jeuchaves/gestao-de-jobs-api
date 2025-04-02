@@ -7,18 +7,26 @@ interface IJobAverageTime {
 
 export const jobsAverageTime = async (
     startDate: string,
-    endDate: string
+    endDate: string,
+    responsibleId?: number
 ): Promise<IJobAverageTime | Error> => {
     try {
         // Média para o período principal
-        const averageTimeSheet = await Knex(ETableNames.job)
+        const query = Knex(ETableNames.job)
             .where('timeSheet', '>', 0)
             .whereRaw('updated_at::date BETWEEN ?::date AND ?::date', [
                 startDate,
                 endDate,
             ])
-            .avg('timeSheet as average_time_sheet')
-            .first();
+            .avg('timeSheet as average_time_sheet');
+
+        // Adiciona o filtro por responsibleId se ele foi fornecido
+        if (responsibleId !== undefined) {
+            query.where('responsibleId', responsibleId);
+        }
+
+        // Executa a query
+        const averageTimeSheet = await query.count('* as total').first();
 
         // Convertendo para número e tratando valores nulos
         const averageTime = Number(averageTimeSheet?.average_time_sheet) || 0;

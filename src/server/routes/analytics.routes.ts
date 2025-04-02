@@ -20,7 +20,7 @@ analyticsRouter.get(
 analyticsRouter.get(
     '/analytics/jobs-average-time',
     ensureAuthenticated,
-    AnalyticsController.analyticsValidation,
+    AnalyticsController.jobsAverageTimeValidation,
     AnalyticsController.jobsAverageTime
 );
 
