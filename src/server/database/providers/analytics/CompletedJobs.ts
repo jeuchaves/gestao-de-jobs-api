@@ -3,41 +3,35 @@ import { Knex } from '../../knex';
 
 interface IJobComparison {
     total: number;
-    comparison: number;
 }
 
 export const completedJobs = async (
     startDate: string,
     endDate: string,
-    startDateComparison: string,
-    endDateComparison: string
+    responsibleId?: number
 ): Promise<IJobComparison | Error> => {
     try {
-        const totalQuery = await Knex(ETableNames.job)
+        const query = Knex(ETableNames.job)
             .where('timeSheet', '>', 0)
             .whereRaw('updated_at::date BETWEEN ?::date AND ?::date', [
                 startDate,
                 endDate,
             ])
-            .count('* as total')
-            .first();
+            .count('* as total');
 
-        const comparisonQuery = await Knex(ETableNames.job)
-            .where('timeSheet', '>', 0)
-            .whereRaw('updated_at::date BETWEEN ?::date AND ?::date', [
-                startDateComparison,
-                endDateComparison,
-            ])
-            .count('* as total')
-            .first();
+        // Adiciona o filtro por responsibleId se ele foi fornecido
+        if (responsibleId !== undefined) {
+            query.where('responsibleId', responsibleId);
+        }
+
+        // Executa a query
+        const totalQuery = await query.count('* as total').first();
 
         // Convertendo os resultados
         const completedJobs = Number(totalQuery?.total) || 0;
-        const completedJobsComparison = Number(comparisonQuery?.total) || 0;
 
         return {
             total: completedJobs,
-            comparison: completedJobsComparison,
         } as IJobComparison;
     } catch (error) {
         console.error(error);

@@ -13,7 +13,7 @@ analyticsRouter.get(
 analyticsRouter.get(
     '/analytics/completed-jobs',
     ensureAuthenticated,
-    AnalyticsController.analyticsValidation,
+    AnalyticsController.completedJobsValidation,
     AnalyticsController.completedJobs
 );
 
