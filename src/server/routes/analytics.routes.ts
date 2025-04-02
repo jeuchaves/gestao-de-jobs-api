@@ -27,7 +27,7 @@ analyticsRouter.get(
 analyticsRouter.get(
     '/analytics/jobs-change-percentage',
     ensureAuthenticated,
-    AnalyticsController.analyticsValidation,
+    AnalyticsController.jobsChangePercentageValidation,
     AnalyticsController.jobsChangePercentage
 );
 

@@ -12,7 +12,7 @@ interface IJobsChangePercentageProps {
     endDateComparison?: string;
 }
 
-export const jobsAverageTimeValidation = validation((getSchema) => ({
+export const jobsChangePercentageValidation = validation((getSchema) => ({
     query: getSchema<IJobsChangePercentageProps>(
         object({
             responsibleId: number().optional(),
