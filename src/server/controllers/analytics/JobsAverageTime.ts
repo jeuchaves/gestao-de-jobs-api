@@ -16,9 +16,9 @@ export const jobsAverageTime = async (
             .json({ errors: { message: 'Parâmetros inválidos.' } });
     }
 
-    const result = await AnalyticsProvider.jobsAverageTime(
-        startDate,
-        endDate,
+    const result = await AnalyticsProvider.jobsAverageTime(startDate, endDate);
+
+    const comparisonResult = await AnalyticsProvider.jobsAverageTime(
         startDateComparison,
         endDateComparison
     );
@@ -29,5 +29,14 @@ export const jobsAverageTime = async (
             .send(result.message);
     }
 
-    return res.status(StatusCodes.OK).json(result);
+    if (comparisonResult instanceof Error) {
+        return res
+            .status(StatusCodes.INTERNAL_SERVER_ERROR)
+            .send(comparisonResult.message);
+    }
+
+    return res.status(StatusCodes.OK).json({
+        averageTime: result.total,
+        comparisonAverageTime: comparisonResult.total,
+    });
 };
