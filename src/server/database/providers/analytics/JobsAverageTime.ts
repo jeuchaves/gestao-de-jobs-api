@@ -2,39 +2,38 @@ import { ETableNames } from '../../ETableNames';
 import { Knex } from '../../knex';
 
 interface IJobAverageTime {
-    averageTime: number;
-    comparisonAverageTime: number;
+    total: number;
 }
 
 export const jobsAverageTime = async (
     startDate: string,
     endDate: string,
-    startDateComparison: string,
-    endDateComparison: string
+    responsibleId?: number
 ): Promise<IJobAverageTime | Error> => {
     try {
-        const averageTimeSheet = await Knex(ETableNames.job)
+        // Média para o período principal
+        const query = Knex(ETableNames.job)
             .where('timeSheet', '>', 0)
-            .whereBetween('created_at', [startDate, endDate])
+            .whereRaw('updated_at::date BETWEEN ?::date AND ?::date', [
+                startDate,
+                endDate,
+            ]);
+
+        // Adiciona o filtro por responsibleId se ele foi fornecido
+        if (responsibleId !== undefined) {
+            query.where('responsibleId', responsibleId);
+        }
+
+        // Executa a query
+        const averageTimeSheet = await query
             .avg('timeSheet as average_time_sheet')
             .first();
 
-        const comparisonAverageTimeSheet = await Knex(ETableNames.job)
-            .where('timeSheet', '>', 0)
-            .whereBetween('created_at', [
-                startDateComparison,
-                endDateComparison,
-            ])
-            .avg('timeSheet as comparison_average_time_sheet')
-            .first();
-
-        const averageTime = averageTimeSheet?.average_time_sheet ?? 0;
-        const comparisonAverageTime =
-            comparisonAverageTimeSheet?.comparison_average_time_sheet ?? 0;
+        // Convertendo para número e tratando valores nulos
+        const averageTime = Number(averageTimeSheet?.average_time_sheet) || 0;
 
         return {
-            averageTime,
-            comparisonAverageTime,
+            total: averageTime,
         };
     } catch (error) {
         console.error(error);

@@ -1,12 +1,11 @@
+import './shared/services/TranslationsYup';
+
 import swaggerUi from 'swagger-ui-express';
 import express from 'express';
 import cors from 'cors';
 
 import { router } from './routes';
-
 import swaggerDocs from './shared/services/swagger.json';
-
-import './shared/services/TranslationsYup';
 
 const server = express();
 
