@@ -5,30 +5,29 @@ import { AnalyticsController } from '../controllers';
 const analyticsRouter = Router();
 
 analyticsRouter.get(
-    '/analytics/jobs-comparison',
+    '/analytics/remaining-jobs',
     ensureAuthenticated,
-    AnalyticsController.analyticsValidation,
-    AnalyticsController.jobsComparison
+    AnalyticsController.remainingJobs
 );
 
 analyticsRouter.get(
     '/analytics/completed-jobs',
     ensureAuthenticated,
-    AnalyticsController.analyticsValidation,
+    AnalyticsController.completedJobsValidation,
     AnalyticsController.completedJobs
 );
 
 analyticsRouter.get(
     '/analytics/jobs-average-time',
     ensureAuthenticated,
-    AnalyticsController.analyticsValidation,
+    AnalyticsController.jobsAverageTimeValidation,
     AnalyticsController.jobsAverageTime
 );
 
 analyticsRouter.get(
     '/analytics/jobs-change-percentage',
     ensureAuthenticated,
-    AnalyticsController.analyticsValidation,
+    AnalyticsController.jobsChangePercentageValidation,
     AnalyticsController.jobsChangePercentage
 );
 

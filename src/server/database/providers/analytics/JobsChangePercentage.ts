@@ -3,63 +3,53 @@ import { Knex } from '../../knex';
 
 interface IJobsChangePercentage {
     changePercentage: number;
-    comparisonChangePercentage: number;
+    totalJobs: number;
+    changeJobs: number;
 }
 
 export const jobsChangePercentage = async (
     startDate: string,
     endDate: string,
-    startDateComparison: string,
-    endDateComparison: string
+    responsibleId?: number
 ): Promise<IJobsChangePercentage | Error> => {
     try {
-        // Total de jobs no período principal
-        const totalJobs = await Knex(ETableNames.job)
-            .whereBetween('created_at', [startDate, endDate])
+        // Base query para ambos os casos
+        const baseQuery = () => {
+            let query = Knex(ETableNames.job)
+                .where('timeSheet', '>', 0)
+                .whereRaw('updated_at::date BETWEEN ?::date AND ?::date', [
+                    startDate,
+                    endDate,
+                ]);
+
+            if (responsibleId !== undefined) {
+                query = query.where('responsibleId', responsibleId);
+            }
+
+            return query;
+        };
+
+        // Total de jobs completados no período
+        const totalJobsResult = await baseQuery().count('* as total').first();
+
+        // Total de jobs que são alterações no período
+        const changeJobsResult = await baseQuery()
+            .where('isChangeRequest', true)
             .count('* as total')
             .first();
 
-        // Total de jobs que são alterações no período principal
-        const changeJobs = await Knex(ETableNames.job)
-            .whereBetween('created_at', [startDate, endDate])
-            .andWhere('isChangeRequest', true)
-            .count('* as total')
-            .first();
+        // Convertendo os resultados
+        const totalJobs = Number(totalJobsResult?.total) || 0;
+        const changeJobs = Number(changeJobsResult?.total) || 0;
 
-        // Total de jobs no período de comparação
-        const comparisonTotalJobs = await Knex(ETableNames.job)
-            .whereBetween('created_at', [
-                startDateComparison,
-                endDateComparison,
-            ])
-            .count('* as total')
-            .first();
-
-        // Total de jobs que são alterações no período de comparação
-        const comparisonChangeJobs = await Knex(ETableNames.job)
-            .whereBetween('created_at', [
-                startDateComparison,
-                endDateComparison,
-            ])
-            .andWhere('isChangeRequest', true)
-            .count('* as total')
-            .first();
-
-        // Extrai os valores e calcula a porcentagem
-        const total = Number(totalJobs?.total) || 0;
-        const changes = Number(changeJobs?.total) || 0;
-        const comparisonTotal = Number(comparisonTotalJobs?.total) || 0;
-        const comparisonChanges = Number(comparisonChangeJobs?.total) || 0;
-
-        const changePercentage = total > 0 ? (changes / total) * 100 : 0;
-        const comparisonChangePercentage =
-            comparisonTotal > 0
-                ? (comparisonChanges / comparisonTotal) * 100
-                : 0;
+        // Calculando a porcentagem (com proteção contra divisão por zero)
+        const changePercentage =
+            totalJobs > 0 ? (changeJobs / totalJobs) * 100 : 0;
 
         return {
             changePercentage,
-            comparisonChangePercentage,
+            totalJobs,
+            changeJobs,
         };
     } catch (error) {
         console.error(error);
